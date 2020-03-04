@@ -42,6 +42,13 @@ function createRemoveBtn() {
   removeBtn.className = 'btn btn-danger btn-sm remove-btn';
   removeBtn.type = 'button';
   removeBtn.value = 'X';
-  removeBtn.setAttribute('onclick', 'remove(this);');
+  removeBtn.setAttribute('onclick', 'RemoveBtn(this);');
   return removeBtn;
+}
+
+function RemoveBtn(button) {
+  const row = button.parentNode.parentNode;
+  if(confirm('Are you sure?')) {
+    table.deleteRow(row.rowIndex);
+  }
 }
