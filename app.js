@@ -1,112 +1,86 @@
 const container = document.querySelector('.container');
 const form = document.getElementById('book-form');
+const table = document.getElementById('table');
 const bookTitle = document.getElementById('exampleInputBookTitle');
 const bookAuthor = document.getElementById('exampleInputAuthor');
 const bookIsbn = document.getElementById('exampleInputISBN');
-const table = document.getElementById('table');
 const tableBody = document.getElementById('table-body');
 const btnSubmit = document.getElementById('btn-submit');
 
-form.addEventListener('click', addBookItem);
+function Book(bookTitle, bookAuthor, bookIsbn) {
+  this.bookTitle = bookTitle;
+  this.bookAuthor = bookAuthor;
+  this.bookIsbn = bookIsbn;
+}
 
-function addBookItem(e) {
-  if(bookTitle.value === '' || bookAuthor.value === '' || bookIsbn.value === '') {
-    showAlertError('Pleas complete all fields');
-    return;
-  }
+function UI() {}
 
-  let rowBookList = tableBody.insertRow(0);
-  let newCellTitle = rowBookList.insertCell(0);
-  let newTitle = document.createTextNode(bookTitle.value);
-  newCellTitle.appendChild(newTitle);
+UI.prototype.addBookToList = function(book) {
+  const row = document.createElement('tr');
+  row.innerHTML = `
+  <td>${book.bookTitle}</td>
+  <td>${book.bookAuthor}</td>
+  <td>${book.bookIsbn}</td>
+  <td><a href="#" class="remove-btn text-danger">X</a></td>
+  `;
+  tableBody.appendChild(row);
 
-  let newCellAuthor = rowBookList.insertCell(1);
-  let newAuthor = document.createTextNode(bookAuthor.value);
-  newCellAuthor.appendChild(newAuthor);
+}
 
-  let newCellIsbn = rowBookList.insertCell(2);
-  let newIsbn = document.createTextNode(bookIsbn.value);
-  newCellIsbn.appendChild(newIsbn);
-
-  let newCellRemoveBtn = rowBookList.insertCell(3);
-  newCellRemoveBtn.appendChild(createRemoveBtn());
-
-  showAlertAdd('This item has been added');
-
-  //storeItemInLocalStorage(bookTitle.value, bookAuthor.value, bookIsbn.value);
-
+UI.prototype.clearFields = function() {
   bookTitle.value = '';
   bookAuthor.value = '';
   bookIsbn.value = '';
+}
+
+UI.prototype.showAlert = function(alert, className) {
+  const divAlert = document.createElement('div');
+  divAlert.className = `alert ${className}`;
+  divAlert.appendChild(document.createTextNode(alert));
+
+  container.insertBefore(divAlert, form);
+
+  setTimeout(function() {
+    document.querySelector('.alert').remove();
+  }, 3000);
+}
+
+UI.prototype.deleteBook = function(target) {
+  if(target.className === 'remove-btn') {
+    target.parentElement.parentElement.remove();    
+  }
+}
+
+
+form.addEventListener('submit', addBookItem);
+
+function addBookItem(e) {
+  const title = bookTitle.value;
+  const author = bookAuthor.value;
+  const isbn = bookIsbn.value;
+  
+  const ui = new UI();
+
+  if(title === '' || author === '' || isbn === '') {
+    ui.showAlert('Pleas complete all fields',  'alert-warning');
+    return;
+  } 
+
+  const book = new Book (title, author, isbn);
+
+  ui.addBookToList(book);
+
+  ui.clearFields();
+
+  ui.showAlert('This item has been added',  'alert-success'); 
 
    e.preventDefault();
 }
 
-function createRemoveBtn() {
-  const removeBtn = document.createElement('input');
-  removeBtn.className = 'btn btn-danger btn-sm remove-btn';
-  removeBtn.type = 'button';
-  removeBtn.value = 'X';
-  removeBtn.setAttribute('onclick', 'RemoveBtn(this);');
-  return removeBtn;
-}
+tableBody.addEventListener('click', function(e) {  
+  const ui = new UI;
+  ui.deleteBook(e.target);
+  ui.showAlert('This item has been deleted',  'alert-danger');
 
-function RemoveBtn(button) {
-  const row = button.parentNode.parentNode;
-  if(confirm('Are you sure?')) {
-    table.deleteRow(row.rowIndex);
-    showAlertDelete('This item has been deleted')
-  }
-}
-
-// function storeItemInLocalStorage(title, author, isbn) {
-//   const items = setItems();
-//   let entry = new Object;
-//   entry.name1 = title;
-//   entry.name2 = author;
-//   entry.value = isbn;
-//   items.push(entry);
-
-//   localStorage.setItem('items', JSON.stringify(items));
-// }
-
-// function getItems() {
-//   let items;
-//   if (localStorage.getItem('items') === null) {
-//     items = [];
-//   } else {
-//     items = JSON.parse(localStorage.getItem('items'));
-//   }
-//   return items;
-// }
-
-function showAlertDelete(alertDelete) {
-  const divAlertDelete = document.createElement('div');
-  divAlertDelete.className = 'alert alert-danger';
-  divAlertDelete.appendChild(document.createTextNode(alertDelete));
-
-  container.insertBefore(divAlertDelete, form);
-  setTimeout(clearAlert, 3000);
-}
-
-function showAlertAdd(alertAdded) {
-  const divAlertAdded = document.createElement('div');
-  divAlertAdded.className = 'alert alert-success';
-  divAlertAdded.appendChild(document.createTextNode(alertAdded));
-
-  container.insertBefore(divAlertAdded, form);
-  setTimeout(clearAlert, 3000);
-}
-
-function showAlertError (alertError) {
-  const divAlertError = document.createElement('div');
-  divAlertError.className = 'alert alert-warning';
-  divAlertError.appendChild(document.createTextNode(alertError));
-
-  container.insertBefore(divAlertError, form);
-  setTimeout(clearAlert, 3000);
-}
-
-function clearAlert() {
-  document.querySelector('.alert').remove();
-}
+  e.preventDefault();
+});
