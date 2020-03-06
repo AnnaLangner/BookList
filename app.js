@@ -46,8 +46,17 @@ UI.prototype.showAlert = function(alert, className) {
 }
 
 UI.prototype.deleteBook = function(target) {
-  if(target.className === 'remove-btn') {
-    target.parentElement.parentElement.remove();    
+  if(target.classList.contains("remove-btn")) {
+    target.parentElement.parentElement.remove();  
+    const divAlert = document.createElement('div');
+    divAlert.className = 'alert alert-danger';
+    divAlert.appendChild(document.createTextNode('This item has been deleted'));
+
+    container.insertBefore(divAlert, form);
+
+    setTimeout(function() {
+      document.querySelector('.alert').remove();
+    }, 3000);  
   }
 }
 
@@ -80,7 +89,5 @@ function addBookItem(e) {
 tableBody.addEventListener('click', function(e) {  
   const ui = new UI;
   ui.deleteBook(e.target);
-  ui.showAlert('This item has been deleted',  'alert-danger');
-
   e.preventDefault();
 });
