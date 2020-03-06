@@ -47,16 +47,10 @@ class UI {
 
   deleteBook(target) {
     if(target.classList.contains("remove-btn")) {
-      target.parentElement.parentElement.remove();  
-      const divAlert = document.createElement('div');
-      divAlert.className = 'alert alert-danger';
-      divAlert.appendChild(document.createTextNode('This item has been deleted'));
-  
-      container.insertBefore(divAlert, form);
-  
-      setTimeout(function() {
-        document.querySelector('.alert').remove();
-      }, 3000);  
+      target.parentElement.parentElement.remove(); 
+      return true;
+    } else {
+      return false;
     }
   }
 }
@@ -85,7 +79,12 @@ function addBookItem(e) {
 
 tableBody.addEventListener('click', function(e) {  
   const ui = new UI;
-  ui.deleteBook(e.target);
+  const result = ui.deleteBook(e.target);
+
+  if(result === true) {
+    ui.showAlert('This item has been deleted',  'alert-danger');
+  }
   
+
   e.preventDefault();
 });
