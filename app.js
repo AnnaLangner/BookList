@@ -83,8 +83,7 @@ tableBody.addEventListener('click', function(e) {
 
   if(result === true) {
     ui.showAlert('This item has been deleted',  'alert-danger');
-  }
-  
+  } 
 
   e.preventDefault();
 });
